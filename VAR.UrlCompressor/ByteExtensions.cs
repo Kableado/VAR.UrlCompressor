@@ -1,4 +1,6 @@
-﻿namespace VAR.UrlCompressor
+﻿using System;
+
+namespace VAR.UrlCompressor
 {
     static class ByteExtensions
     {
@@ -27,6 +29,18 @@
             {
                 bytes[bytePosition] = (byte)(bytes[bytePosition] & (0xffffffff - (0x1 << (7 - bitPosition))));
             }
+        }
+
+        public static byte[] WriteByte(this byte[] bytes, int position, byte value)
+        {
+            while (bytes.Length <= position)
+            {
+                byte[] newBytes = new byte[bytes.Length * 2];
+                Array.Copy(bytes, newBytes, bytes.Length);
+                bytes = newBytes;
+            }
+            bytes[position] = value;
+            return bytes;
         }
     }
 }

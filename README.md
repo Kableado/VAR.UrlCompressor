@@ -9,11 +9,11 @@ Add the resulting assembly as reference in your projects, and this line on code:
 
 Compress an URL with:
 
-	string compressedUrl = UrlContressor.Compress("https:\\google.com");
+	string compressedUrl = UrlCompressor.Compress("https:\\google.com");
 
 Decompress an URL with:
 
-	string decompressedUrl = UrlContressor.Compress("xGncYbYfopHYpG0");
+	string decompressedUrl = UrlCompressor.Compress("xGncYbYfopHYpG0");
 	
 ### UrlCompressor.Tests
 It is a simple console application, to test basic funcitionallity of the library.

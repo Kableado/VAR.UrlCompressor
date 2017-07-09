@@ -7,33 +7,6 @@ namespace VAR.UrlCompressor
     {
         private static string Base62CodingSpace = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-        private static bool ReadBit(byte[] bytes, int position, int offset)
-        {
-            if (offset < 0) { return false; }
-            int tempPos = position + offset;
-            int bytePosition = tempPos / 8;
-            int bitPosition = tempPos % 8;
-            if (bytePosition >= bytes.Length) { return false; }
-            return (bytes[bytePosition] & (0x01 << (7 - bitPosition))) > 0;
-        }
-
-        private static void WriteBit(byte[] bytes, int position, int offset, bool value)
-        {
-            if (offset < 0) { return; }
-            int tempPos = position + offset;
-            int bytePosition = tempPos / 8;
-            int bitPosition = tempPos % 8;
-            if (bytePosition >= bytes.Length) { return; }
-            if (value)
-            {
-                bytes[bytePosition] = (byte)(bytes[bytePosition] | (0x01 << (7 - bitPosition)));
-            }
-            else
-            {
-                bytes[bytePosition] = (byte)(bytes[bytePosition] & (0xffffffff - (0x1 << (7 - bitPosition))));
-            }
-        }
-        
         public static string Encode(byte[] original)
         {
             StringBuilder sb = new StringBuilder();
@@ -47,12 +20,12 @@ namespace VAR.UrlCompressor
                 {
                     pad = lenght - (bitPosition + 6);
                 }
-                bool bit0 = ReadBit(original, bitPosition, 0 + pad);
-                bool bit1 = ReadBit(original, bitPosition, 1 + pad);
-                bool bit2 = ReadBit(original, bitPosition, 2 + pad);
-                bool bit3 = ReadBit(original, bitPosition, 3 + pad);
-                bool bit4 = ReadBit(original, bitPosition, 4 + pad);
-                bool bit5 = ReadBit(original, bitPosition, 5 + pad);
+                bool bit0 = original.ReadBit(bitPosition, 0 + pad);
+                bool bit1 = original.ReadBit(bitPosition, 1 + pad);
+                bool bit2 = original.ReadBit(bitPosition, 2 + pad);
+                bool bit3 = original.ReadBit(bitPosition, 3 + pad);
+                bool bit4 = original.ReadBit(bitPosition, 4 + pad);
+                bool bit5 = original.ReadBit(bitPosition, 5 + pad);
 
                 if (bit0 == true && bit1 == true && bit2 == true && bit3 == true && bit4 == true)
                 {
@@ -87,42 +60,42 @@ namespace VAR.UrlCompressor
                     if (rest == 8) { throw new Exception("Extra symbol at end"); }
                     if ((charIdx >> rest) > 0) { throw new Exception("Invalid ending symbol"); }
                     int pad = 6 - rest;
-                    WriteBit(bytes, bitPosition, 0 - pad, (charIdx & 0x20) > 0);
-                    WriteBit(bytes, bitPosition, 1 - pad, (charIdx & 0x10) > 0);
-                    WriteBit(bytes, bitPosition, 2 - pad, (charIdx & 0x08) > 0);
-                    WriteBit(bytes, bitPosition, 3 - pad, (charIdx & 0x04) > 0);
-                    WriteBit(bytes, bitPosition, 4 - pad, (charIdx & 0x02) > 0);
-                    WriteBit(bytes, bitPosition, 5 - pad, (charIdx & 0x01) > 0);
+                    bytes.WriteBit(bitPosition, 0 - pad, (charIdx & 0x20) > 0);
+                    bytes.WriteBit(bitPosition, 1 - pad, (charIdx & 0x10) > 0);
+                    bytes.WriteBit(bitPosition, 2 - pad, (charIdx & 0x08) > 0);
+                    bytes.WriteBit(bitPosition, 3 - pad, (charIdx & 0x04) > 0);
+                    bytes.WriteBit(bitPosition, 4 - pad, (charIdx & 0x02) > 0);
+                    bytes.WriteBit(bitPosition, 5 - pad, (charIdx & 0x01) > 0);
 
                     break;
                 }
 
                 if (charIdx == 60)
                 {
-                    WriteBit(bytes, bitPosition, 0, true);
-                    WriteBit(bytes, bitPosition, 1, true);
-                    WriteBit(bytes, bitPosition, 2, true);
-                    WriteBit(bytes, bitPosition, 3, true);
-                    WriteBit(bytes, bitPosition, 4, false);
+                    bytes.WriteBit(bitPosition, 0, true);
+                    bytes.WriteBit(bitPosition, 1, true);
+                    bytes.WriteBit(bitPosition, 2, true);
+                    bytes.WriteBit(bitPosition, 3, true);
+                    bytes.WriteBit(bitPosition, 4, false);
                     bitPosition += 5;
                 }
                 else if (charIdx == 61)
                 {
-                    WriteBit(bytes, bitPosition, 0, true);
-                    WriteBit(bytes, bitPosition, 1, true);
-                    WriteBit(bytes, bitPosition, 2, true);
-                    WriteBit(bytes, bitPosition, 3, true);
-                    WriteBit(bytes, bitPosition, 4, true);
+                    bytes.WriteBit(bitPosition, 0, true);
+                    bytes.WriteBit(bitPosition, 1, true);
+                    bytes.WriteBit(bitPosition, 2, true);
+                    bytes.WriteBit(bitPosition, 3, true);
+                    bytes.WriteBit(bitPosition, 4, true);
                     bitPosition += 5;
                 }
                 else
                 {
-                    WriteBit(bytes, bitPosition, 0, (charIdx & 0x20) > 0);
-                    WriteBit(bytes, bitPosition, 1, (charIdx & 0x10) > 0);
-                    WriteBit(bytes, bitPosition, 2, (charIdx & 0x08) > 0);
-                    WriteBit(bytes, bitPosition, 3, (charIdx & 0x04) > 0);
-                    WriteBit(bytes, bitPosition, 4, (charIdx & 0x02) > 0);
-                    WriteBit(bytes, bitPosition, 5, (charIdx & 0x01) > 0);
+                    bytes.WriteBit(bitPosition, 0, (charIdx & 0x20) > 0);
+                    bytes.WriteBit(bitPosition, 1, (charIdx & 0x10) > 0);
+                    bytes.WriteBit(bitPosition, 2, (charIdx & 0x08) > 0);
+                    bytes.WriteBit(bitPosition, 3, (charIdx & 0x04) > 0);
+                    bytes.WriteBit(bitPosition, 4, (charIdx & 0x02) > 0);
+                    bytes.WriteBit(bitPosition, 5, (charIdx & 0x01) > 0);
                     bitPosition += 6;
                 }
             }

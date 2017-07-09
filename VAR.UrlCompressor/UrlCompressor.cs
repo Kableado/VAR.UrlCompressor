@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace VAR.UrlCompressor
 {
@@ -10,14 +7,36 @@ namespace VAR.UrlCompressor
     {
         public static string Compress(string url)
         {
-            // FIXME: Implement this
-            return string.Empty;
+            // Replace protocol indicator
+            if (url.StartsWith("https://") || url.StartsWith("HTTPS://"))
+            {
+                url = string.Format("${0}", url.Substring("https://".Length));
+            }
+            if (url.StartsWith("http://") || url.StartsWith("HTTP://"))
+            {
+                url = string.Format("#{0}", url.Substring("http://".Length));
+            }
+
+            byte[] urlBytes = Encoding.ASCII.GetBytes(url);
+            return Base62.Encode(urlBytes);
         }
 
         public static string Decompress(string compressedUrl)
         {
-            // FIXME: Implement this
-            return string.Empty;
+            byte[] urlBytes = Base62.Decode(compressedUrl);
+            string url = Encoding.ASCII.GetString(urlBytes);
+
+            // Restore protocol indicator
+            if (url.StartsWith("#"))
+            {
+                url = string.Format("http://{0}", url.Substring(1));
+            }
+            if (url.StartsWith("$"))
+            {
+                url = string.Format("https://{0}", url.Substring(1));
+            }
+
+            return url;
         }
     }
 }

@@ -13,6 +13,7 @@ namespace UrlCompressor.Tests
             TestUrl("https://twitter.com");
             TestUrl("https://twitter.com/Kableado");
             TestUrl("https://github.com/Kableado");
+            TestUrl("https://varstudio.net");
 
             Console.Read();
         }

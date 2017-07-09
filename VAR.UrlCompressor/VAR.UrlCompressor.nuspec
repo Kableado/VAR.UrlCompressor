@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>https://github.com/Kableado/VAR.UrlCompressor/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/Kableado/VAR.UrlCompressor</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>Copyright VAR 2017</copyright>
+    <tags>URL Compression Library</tags>
+  </metadata>
+  <files>
+    <file src="bin\Release\net461\VAR.UrlCompressor.dll" target="lib\net461\VAR.UrlCompressor.dll" />
+    <file src="bin\Release\net461\VAR.UrlCompressor.pdb" target="lib\net461\VAR.UrlCompressor.pdb" />
+    <file src="bin\Release\net35\VAR.UrlCompressor.dll" target="lib\net35\VAR.UrlCompressor.dll" />
+    <file src="bin\Release\net35\VAR.UrlCompressor.pdb" target="lib\net35\VAR.UrlCompressor.pdb" />
+  </files>
+</package>

@@ -65,32 +65,36 @@ namespace VAR.UrlCompressor
             }
         }
 
+        private int _bitPosition = 0;
+        private List<bool> _encodedSymbol = new List<bool>();
+        private byte[] _scratch = null; 
+
+        private void EncodeChar(char data)
+        {
+            _encodedSymbol.Clear();
+            _encodedSymbol = Root.Traverse(data, _encodedSymbol);
+            foreach (bool v in _encodedSymbol)
+            {
+                _scratch.WriteBit(_bitPosition, 0, v);
+                _bitPosition++;
+            }
+        }
+
         public byte[] Encode(byte[] data)
         {
-            byte[] scratch = new byte[data.Length * 2];
-            int bitPosition = 0;
-            var encodedSymbol = new List<bool>();
+            _scratch = new byte[data.Length * 2];
+            _bitPosition = 0;
 
             for (int i = 0; i < data.Length; i++)
             {
-                encodedSymbol.Clear();
-                encodedSymbol = Root.Traverse((char)data[i], encodedSymbol);
-                foreach(bool v in encodedSymbol)
-                {
-                    scratch.WriteBit(bitPosition, 0, v);
-                    bitPosition++;
-                }
+                EncodeChar((char)data[i]);
             }
-            encodedSymbol.Clear();
-            encodedSymbol = Root.Traverse(EOD, encodedSymbol);
-            foreach (bool v in encodedSymbol)
-            {
-                scratch.WriteBit(bitPosition, 0, v);
-                bitPosition++;
-            }
-            int byteLenght = (int)Math.Ceiling((double)bitPosition / 8);
+            EncodeChar(EOD);
+
+            int byteLenght = (int)Math.Ceiling((double)_bitPosition / 8);
             byte[] compressedData = new byte[byteLenght];
-            Array.Copy(scratch, compressedData, byteLenght);
+            Array.Copy(_scratch, compressedData, byteLenght);
+            _scratch = null;
 
             return compressedData;
         }
@@ -98,15 +102,15 @@ namespace VAR.UrlCompressor
         public byte[] Decode(byte[] data)
         {
             HuffmanTreeNode current = Root;
-            byte[] scratch = new byte[data.Length];
-            int bitPosition = 0;
+            _scratch = new byte[data.Length];
+            _bitPosition = 0;
             int bytePosition = 0;
 
             int lenght = data.Length * 8;
-            while (bitPosition < lenght)
+            while (_bitPosition < lenght)
             {
-                bool bit = data.ReadBit(bitPosition, 0);
-                bitPosition++;
+                bool bit = data.ReadBit(_bitPosition, 0);
+                _bitPosition++;
                 if (bit)
                 {
                     if (current.Right != null)
@@ -125,14 +129,15 @@ namespace VAR.UrlCompressor
                 if (current.IsLeaf())
                 {
                     if (current.Symbol == EOD) { break; }
-                    scratch = scratch.WriteByte(bytePosition, (byte)current.Symbol);
+                    _scratch = _scratch.WriteByte(bytePosition, (byte)current.Symbol);
                     bytePosition++;
                     current = Root;
                 }
             }
 
             byte[] decompressedData = new byte[bytePosition];
-            Array.Copy(scratch, decompressedData, bytePosition);
+            Array.Copy(_scratch, decompressedData, bytePosition);
+            _scratch = null;
 
             return decompressedData;
         }

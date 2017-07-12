@@ -6,7 +6,7 @@ namespace VAR.UrlCompressor
     public class UrlCompressor
     {
         private static HuffmanTree _huffmanTree = null;
-
+        
         private static void InitHuffmanTree()
         {
             if (_huffmanTree != null) { return; }
@@ -81,21 +81,21 @@ namespace VAR.UrlCompressor
                 { '8', 1000},
                 { '9', 1000},
                 
-                // Common simbols
+                // Common symbols
                 { ' ', 100},
                 { '!', 100},
                 { '"', 100},
-                { '#', 50000}, // NOTE: Exagerate to minimize bitstream of this symbol '#'
-                { '$', 50000}, // NOTE: Exagerate to minimize bitstream of this symbol '$'
+                { '#', 20000}, // NOTE: Exagerate to minimize bitstream of this symbol '#'
+                { '$', 20000}, // NOTE: Exagerate to minimize bitstream of this symbol '$'
                 { '%', 100},
                 { '&', 100},
-                { '\'', 100},
+                { '\'', 20000}, // NOTE: Exagerate to minimize bitstream of this symbol '/'
                 { '(', 100},
                 { '*', 100},
                 { '+', 100},
                 { ',', 100},
                 { '-', 100},
-                { '.', 100},
+                { '.', 20000}, // NOTE: Exagerate to minimize bitstream of this symbol '.'
                 { '/', 100},
                 { ':', 100},
                 { ';', 100},

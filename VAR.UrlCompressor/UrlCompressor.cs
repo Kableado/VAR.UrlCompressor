@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace VAR.UrlCompressor
@@ -118,46 +119,79 @@ namespace VAR.UrlCompressor
             _huffmanTree = new HuffmanTree(frequencies);
         }
 
-        public static string Compress(string url)
+        public static string Compress(string url, Dictionary<string, string> hostConversions = null)
         {
             InitHuffmanTree();
 
-            // Replace protocol indicator
-            if (url.StartsWith("https://") || url.StartsWith("HTTPS://"))
+            Url oUrl = Url.CreateFromString(url);
+            
+            // "Compress" protocol
+            if (oUrl.Protocol == "http" || oUrl.Protocol == null) { oUrl.Protocol = "#"; }
+            else if (oUrl.Protocol == "https") { oUrl.Protocol = "$"; }
+            else if (oUrl.Protocol == "ftp") { oUrl.Protocol = "F"; }
+            else { throw new Exception(string.Format("Unkown protocol \"{0}\"", oUrl.Protocol)); }
+
+            if (hostConversions != null)
             {
-                url = string.Format("${0}", url.Substring("https://".Length));
-            }
-            if (url.StartsWith("http://") || url.StartsWith("HTTP://"))
-            {
-                url = string.Format("#{0}", url.Substring("http://".Length));
+                // "Compress" hosts
+                string[] urlHostParts = oUrl.Host.Split('.');
+                for (int i = 0; i < urlHostParts.Length; i++)
+                {
+                    foreach (KeyValuePair<string, string> hostConversion in hostConversions)
+                    {
+                        if (urlHostParts[i] == hostConversion.Key)
+                        {
+                            urlHostParts[i] = hostConversion.Value;
+                            break;
+                        }
+                    }
+                }
+                oUrl.Host = string.Join(".", urlHostParts);
             }
 
+            url = oUrl.ToShortString();
+
+            // Reduce entropy
             byte[] urlBytes = Encoding.ASCII.GetBytes(url);
-
-            byte[] compressedUrlBytes = _huffmanTree.Encode(urlBytes);
-
-            return Base62.Encode(compressedUrlBytes);
+            urlBytes = _huffmanTree.Encode(urlBytes);
+            return Base62.Encode(urlBytes);
         }
 
-        public static string Decompress(string compressedUrl)
+        public static string Decompress(string compressedUrl, Dictionary<string, string> hostConversions = null)
         {
             InitHuffmanTree();
 
             byte[] urlBytes = Base62.Decode(compressedUrl);
+            urlBytes = _huffmanTree.Decode(urlBytes);
+            string url = Encoding.ASCII.GetString(urlBytes);
 
-            byte[] decompressedUrlBytes = _huffmanTree.Decode(urlBytes);
+            Url oUrl = Url.CreateFromShortString(url);
+            
+            // "Decompress" protocol
+            if (oUrl.Protocol == "#") { oUrl.Protocol = "http"; }
+            else if (oUrl.Protocol == "$") { oUrl.Protocol = "https"; }
+            else if (oUrl.Protocol == "F") { oUrl.Protocol = "ftp"; }
+            else { throw new Exception(string.Format("Unkown protocol \"{0}\"", oUrl.Protocol)); }
 
-            string url = Encoding.ASCII.GetString(decompressedUrlBytes);
-
-            // Restore protocol indicator
-            if (url.StartsWith("#"))
+            if (hostConversions != null)
             {
-                url = string.Format("http://{0}", url.Substring(1));
+                // "Decompress" hosts
+                string[] urlHostParts = oUrl.Host.Split('.');
+                for (int i = 0; i < urlHostParts.Length; i++)
+                {
+                    foreach (KeyValuePair<string, string> hostConversion in hostConversions)
+                    {
+                        if (urlHostParts[i] == hostConversion.Value)
+                        {
+                            urlHostParts[i] = hostConversion.Key;
+                            break;
+                        }
+                    }
+                }
+                oUrl.Host = string.Join(".", urlHostParts);
             }
-            if (url.StartsWith("$"))
-            {
-                url = string.Format("https://{0}", url.Substring(1));
-            }
+            
+            url = oUrl.ToString();
 
             return url;
         }

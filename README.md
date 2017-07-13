@@ -23,7 +23,7 @@ Compress an URL with:
 Decompress an URL with:
 
 	string decompressedUrl = UrlCompressor.Decompress("Hk30TGDxt8jOOW6");
-	// decompressedUrl = "Hk30TGDxt8jOOW6";
+	// decompressedUrl = "https:\\google.com";
 	
 For extra compression use host conversions. For example:
 	
@@ -33,6 +33,8 @@ For extra compression use host conversions. For example:
 	}
 	string compressedUrl = UrlCompressor.Compress("https:\\google.com", );
 	// compressedUrl = "oMyuFVR41"
+	string decompressedUrl = UrlCompressor.Decompress("oMyuFVR41");
+	// decompressedUrl = "https:\\google.com";
 
 
 ### UrlCompressor.Tests

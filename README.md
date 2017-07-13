@@ -1,5 +1,13 @@
 # .Net library for compressing URLs
 
+## Instalation
+
+You can install the NuGet package using this command on the package manager:
+	
+	Install-Package VAR.UrlCompressor 
+
+Alternativelly you can copy and reference the assembly resulting of the project VAR.UrlCompressor.
+
 ## Usage
 
 ### VAR.UrlCompressor
@@ -10,16 +18,28 @@ Add the resulting assembly as reference in your projects, and this line on code:
 Compress an URL with:
 
 	string compressedUrl = UrlCompressor.Compress("https:\\google.com");
+	// compressedUrl = "Hk30TGDxt8jOOW6"
 
 Decompress an URL with:
 
-	string decompressedUrl = UrlCompressor.Compress("xGncYbYfopHYpG0");
+	string decompressedUrl = UrlCompressor.Decompress("Hk30TGDxt8jOOW6");
+	// decompressedUrl = "Hk30TGDxt8jOOW6";
 	
+For extra compression use host conversions. For example:
+	
+	Dictionary<string, string> hostConversions = new Dictionary<string, string> {
+		{ "google", "G" }
+		{ "com", "C" }
+	}
+	string compressedUrl = UrlCompressor.Compress("https:\\google.com", );
+	// compressedUrl = "oMyuFVR41"
+
+
 ### UrlCompressor.Tests
 It is a simple console application, to test basic funcitionallity of the library.
 
 ## Building
-A Visual Studio 2015 and 2010 solutions are provided. Simply, click build on the IDE.
+A Visual Studio 2017 solution is provided. Simply, click build on the IDE.
 
 A .nuget package can be build using:
 	VAR.UrlCompressor\Build.NuGet.cmd

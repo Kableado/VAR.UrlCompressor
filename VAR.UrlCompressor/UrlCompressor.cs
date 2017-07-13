@@ -119,6 +119,45 @@ namespace VAR.UrlCompressor
             _huffmanTree = new HuffmanTree(frequencies);
         }
 
+        private static void XorData(byte[] data, byte xorKey)
+        {
+            for (int i = 0; i < data.Length; i++)
+            {
+                data[i] = (byte)(data[i] ^ xorKey);
+            }
+        }
+
+        private static byte ChecksumCalculate(byte[] data)
+        {
+            byte checksum = 0;
+            foreach(byte b in data)
+            {
+                checksum = (byte)(checksum ^ b);
+            }
+            return checksum;
+        }
+
+        private static byte[] ChecksumAdd(byte[] data)
+        {
+            byte[] newData = new byte[data.Length + 1];
+            byte checksum = ChecksumCalculate(data);
+            XorData(data, checksum);
+            Array.Copy(data, 0, newData, 1, data.Length);
+            newData[0] = checksum;
+            return newData;
+        }
+
+        private static byte[] ChecksumCheck(byte[] data)
+        {
+            byte[] newData = new byte[data.Length - 1];
+            Array.Copy(data, 1, newData, 0, data.Length - 1);
+            byte oldChecksum = data[0];
+            XorData(newData, oldChecksum);
+            byte checksum = ChecksumCalculate(newData);
+            if (checksum != oldChecksum) { throw new Exception("Checksum mismatch."); }
+            return newData;
+        }
+
         public static string Compress(string url, Dictionary<string, string> hostConversions = null)
         {
             InitHuffmanTree();
@@ -154,6 +193,7 @@ namespace VAR.UrlCompressor
             // Reduce entropy
             byte[] urlBytes = Encoding.ASCII.GetBytes(url);
             urlBytes = _huffmanTree.Encode(urlBytes);
+            urlBytes = ChecksumAdd(urlBytes);
             return Base62.Encode(urlBytes);
         }
 
@@ -162,6 +202,7 @@ namespace VAR.UrlCompressor
             InitHuffmanTree();
 
             byte[] urlBytes = Base62.Decode(compressedUrl);
+            urlBytes = ChecksumCheck(urlBytes);
             urlBytes = _huffmanTree.Decode(urlBytes);
             string url = Encoding.ASCII.GetString(urlBytes);
 

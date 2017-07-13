@@ -53,6 +53,7 @@ namespace VAR.UrlCompressor
             for (int i = 0; i < base62.Length; i++)
             {
                 int charIdx = Base62CodingSpace.IndexOf(base62[i]);
+                if (charIdx == -1) { continue; }
                 if ((i + 1) == base62.Length)
                 {
                     // Last symbol
@@ -66,7 +67,7 @@ namespace VAR.UrlCompressor
                     bytes.WriteBit(bitPosition, 3 - pad, (charIdx & 0x04) > 0);
                     bytes.WriteBit(bitPosition, 4 - pad, (charIdx & 0x02) > 0);
                     bytes.WriteBit(bitPosition, 5 - pad, (charIdx & 0x01) > 0);
-
+                    bitPosition += (6 - pad);
                     break;
                 }
 
@@ -100,6 +101,8 @@ namespace VAR.UrlCompressor
                 }
             }
 
+
+            Array.Resize(ref bytes, (int)Math.Ceiling((double)bitPosition / 8));
             return bytes;
         }
     }

@@ -20,28 +20,28 @@ using VAR.UrlCompressor;
 Compress an URL with:
 
 ```csharp
-	string compressedUrl = UrlCompressor.Compress("https:\\google.com");
-	// compressedUrl = "Hk30TGDxt8jOOW6"
+string compressedUrl = UrlCompressor.Compress("https:\\google.com");
+// compressedUrl = "Hk30TGDxt8jOOW6"
 ```
 
 Decompress an URL with:
 
 ```csharp
-	string decompressedUrl = UrlCompressor.Decompress("Hk30TGDxt8jOOW6");
-	// decompressedUrl = "https:\\google.com";
+string decompressedUrl = UrlCompressor.Decompress("Hk30TGDxt8jOOW6");
+// decompressedUrl = "https:\\google.com";
 ```
 
 For extra compression use host conversions. For example:
 
 ```csharp
-	Dictionary<string, string> hostConversions = new Dictionary<string, string> {
-		{ "google", "G" }
-		{ "com", "C" }
-	}
-	string compressedUrl = UrlCompressor.Compress("https:\\google.com", );
-	// compressedUrl = "oMyuFVR41"
-	string decompressedUrl = UrlCompressor.Decompress("oMyuFVR41");
-	// decompressedUrl = "https:\\google.com";
+Dictionary<string, string> hostConversions = new Dictionary<string, string> {
+	{ "google", "G" }
+	{ "com", "C" }
+}
+string compressedUrl = UrlCompressor.Compress("https:\\google.com", );
+// compressedUrl = "oMyuFVR41"
+string decompressedUrl = UrlCompressor.Decompress("oMyuFVR41");
+// decompressedUrl = "https:\\google.com";
 ```
 
 
